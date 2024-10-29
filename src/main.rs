@@ -2,7 +2,6 @@ use nannou::prelude::*;
 use nannou::glam::Vec2;
 use nannou::rand::random_range;
 use std::ops::Mul;
-use std::thread;
 
 
 const G: f32 = 0.5;
@@ -97,7 +96,6 @@ fn calculations(objects: &mut Vec<Planet>) {
 }
 
 fn update(app: &App, world: &mut Objects, _update: Update) {
-	let t = app.time;
  
 
 let systems = &mut world.systems;
