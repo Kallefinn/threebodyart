@@ -10,4 +10,4 @@ author = ["Kallefinn"]
 
 [dependencies]
 nannou = "0.19"
-
+nannou_egui = "0.19"
