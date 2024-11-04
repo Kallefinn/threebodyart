@@ -6,6 +6,6 @@ This offset grows bigger showing how upredictable a three body system is.
 
 just clone and run:
   cargo run --release 
+![image](https://github.com/user-attachments/assets/4780285c-cc9c-43cf-a006-27e0f6c53fee)
 
-![image](https://github.com/user-attachments/assets/fa0c0eeb-b01e-4948-8d3b-120402000685)
 
