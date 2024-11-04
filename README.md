@@ -5,4 +5,5 @@ maybe i`ll add some quality of life ui stuff like sliders but for now just resta
 just clone and run:
   cargo run --release 
 
-![image](https://github.com/user-attachments/assets/48c61de8-cb9a-423a-9bf4-eb04794b27fe)
+![image](https://github.com/user-attachments/assets/fa0c0eeb-b01e-4948-8d3b-120402000685)
+
