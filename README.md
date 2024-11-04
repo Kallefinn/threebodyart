@@ -1,5 +1,7 @@
-just a small nannou project to visualize the three body problem
-maybe i`ll add some quality of life ui stuff like sliders but for now just restart to reroll
+just a small nannou project to visualize the three body problem.
+
+There are always three bodies in a system and the systems are drawn on top of each other with a small offset.
+This offset grows bigger showing how upredictable a three body system is.
 
 
 just clone and run:
