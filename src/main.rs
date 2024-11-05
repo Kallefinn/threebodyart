@@ -21,6 +21,7 @@ amount : u16,
 color1 : Srgba, 
 color2 : Srgba, 
 color3 : Srgba,
+trails : f32,
 mass1 : f32,
 mass2 : f32,
 mass3 : f32,
@@ -75,28 +76,27 @@ egui : Egui,
 
 fn new_system(settings : &Settings) -> Vec<Vec<Planet>> {
 	
-let num1 = random_range(-300.0,300.0);
-let num2 = random_range(-300.0,300.0);
-let num3 = random_range(-300.0,300.0);
-let num4 = random_range(-300.0,300.0);
-let num5 = random_range(-300.0,300.0);
-let num6 = random_range(-300.0,300.0);
+	let num1 = random_range(-300.0,300.0);
+	let num2 = random_range(-300.0,300.0);
+	let num3 = random_range(-300.0,300.0);
+	let num4 = random_range(-300.0,300.0);
+	let num5 = random_range(-300.0,300.0);
+	let num6 = random_range(-300.0,300.0);
 
+	let mut systems = Vec::with_capacity(settings.amount.into());
 
-let mut systems = Vec::with_capacity(settings.amount.into());
+	let mut i = 0;
+	while i < settings.amount {
+	let offset = random_range(-settings.offset,settings.offset);
+	systems.push(vec!{
+		Planet{pos: Vec2::new(num1 + offset, num2 + offset),mass: settings.mass1,vel: Vec2::new(0.0,0.0), colour: settings.color1},
+		Planet{pos: Vec2::new(num3 + offset, num4 + offset),mass: settings.mass2,vel: Vec2::new(0.0,0.0), colour: settings.color2},
+		Planet{pos: Vec2::new(num5 + offset, num6 + offset),mass: settings.mass3,vel: Vec2::new(0.0,0.0), colour: settings.color3},
 
-let mut i = 0;
-while i < settings.amount {
-let offset = random_range(-settings.offset,settings.offset);
-systems.push(vec!{
-	Planet{pos: Vec2::new(num1 + offset, num2 + offset),mass: settings.mass1,vel: Vec2::new(0.0,0.0), colour: settings.color1},
-	Planet{pos: Vec2::new(num3 + offset, num4 + offset),mass: settings.mass2,vel: Vec2::new(0.0,0.0), colour: settings.color2},
-	Planet{pos: Vec2::new(num5 + offset, num6 + offset),mass: settings.mass3,vel: Vec2::new(0.0,0.0), colour: settings.color3},
-
-	});
-i += 1;
-}
-return systems
+		});
+	i += 1;
+	}
+	return systems
 }
 
 fn model(app: &App) -> Objects {
@@ -116,6 +116,7 @@ let settings = Settings {
 	color1 : rgba(255.0,100.0,0.0,0.2),
 	color2 : rgba(50.0,0.0,200.0,0.2),
 	color3 : rgba(0.0,128.0,0.0,0.2),
+	trails : 0.4,
 	mass1 : 110.0,
 	mass2 : 240.0,
 	mass3 : 100.0,
@@ -169,7 +170,8 @@ egui::Window::new("Settings").show(&ctx, |ui| {
 	edit_hsv(ui,&mut settings.color2);
 	ui.label("Color Planet 3");
 	edit_hsv(ui,&mut settings.color3);
-	
+	ui.label("Trails");
+	ui.add(egui::Slider::new(&mut settings.trails, 0.0..=1.0));
 	ui.label("Mass Planet 1");
 	ui.add(egui::Slider::new(&mut settings.mass1, 1.0..=1000.0));
 	ui.label("Mass Planet 2");
@@ -218,9 +220,9 @@ fn view(app: &App, world: &Objects, frame: Frame) {
     // Clear the background to blue.
    //	draw.background().color(rgba(0.0,0.0,0.0,0.001));
 	let screen = app.window_rect();
+	let settings = &world.settings;
+	draw.rect().w(screen.w()).h(screen.h()).color(rgba(0.0,0.0,0.0,settings.trails));
 	
-	draw.rect().w(screen.w()).h(screen.h()).color(rgba(0.0,0.0,0.0,0.4));
-
 
 	for objects in world.systems.iter(){
 
