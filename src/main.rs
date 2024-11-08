@@ -87,7 +87,10 @@ fn new_system(settings : &Settings) -> Vec<Vec<Planet>> {
 
 	let mut i = 0;
 	while i < settings.amount {
-	let offset = random_range(-settings.offset,settings.offset);
+	let offset = match settings.offset { 
+		0.0 => 0.0,
+		_ => random_range(-settings.offset,settings.offset),
+	};
 	systems.push(vec!{
 		Planet{pos: Vec2::new(num1 + offset, num2 + offset),mass: settings.mass1,vel: Vec2::new(0.0,0.0), colour: settings.color1},
 		Planet{pos: Vec2::new(num3 + offset, num4 + offset),mass: settings.mass2,vel: Vec2::new(0.0,0.0), colour: settings.color2},
@@ -116,7 +119,7 @@ let settings = Settings {
 	color1 : rgba(255.0,100.0,0.0,0.2),
 	color2 : rgba(50.0,0.0,200.0,0.2),
 	color3 : rgba(0.0,128.0,0.0,0.2),
-	trails : 0.4,
+	trails : 0.6,
 	mass1 : 110.0,
 	mass2 : 240.0,
 	mass3 : 100.0,
@@ -185,7 +188,7 @@ egui::Window::new("Settings").show(&ctx, |ui| {
 	ui.label("Amount of systems");
 	ui.add(egui::Slider::new(&mut settings.amount, 1..=100));
 	ui.label("initial offset");
-	ui.add(egui::Slider::new(&mut settings.offset, -1.0..=1.0));
+	ui.add(egui::Slider::new(&mut settings.offset, 0.0..=1.0));
 	let clicked = ui.button("Regenerate").clicked();
 	if clicked {
 		*systems = new_system(&settings);
@@ -221,7 +224,8 @@ fn view(app: &App, world: &Objects, frame: Frame) {
    //	draw.background().color(rgba(0.0,0.0,0.0,0.001));
 	let screen = app.window_rect();
 	let settings = &world.settings;
-	draw.rect().w(screen.w()).h(screen.h()).color(rgba(0.0,0.0,0.0,settings.trails));
+	let trails = (settings.trails - 1.0) * -1.0;
+	draw.rect().w(screen.w()).h(screen.h()).color(rgba(0.0,0.0,0.0,trails));
 	
 
 	for objects in world.systems.iter(){
