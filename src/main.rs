@@ -45,8 +45,8 @@ fn main() {
 	nannou::app(model).update(update).run();
 }
 
-fn raw_window_event(_app : &App, objects : &mut Objects, event : &nannou::winit::event::WindowEvent) {
-	objects.egui.handle_raw_event(event);
+fn raw_window_event(_app : &App, model : &mut Model, event : &nannou::winit::event::WindowEvent) {
+	model.egui.handle_raw_event(event);
 } 
 fn edit_hsv(ui: &mut egui::Ui, oldcolor: &mut Srgba) {
 	let color : Hsv = (*oldcolor).into();
@@ -68,7 +68,7 @@ if egui::color_picker::color_edit_button_hsva(
 	}
 }
 
-struct Objects {
+struct Model {
 systems : Vec<Vec<Planet>>,
 settings : Settings,
 egui : Egui,
@@ -102,7 +102,7 @@ fn new_system(settings : &Settings) -> Vec<Vec<Planet>> {
 	return systems
 }
 
-fn model(app: &App) -> Objects {
+fn model(app: &App) -> Model {
 
 let window_id = app
 	.new_window()
@@ -129,37 +129,37 @@ let settings = Settings {
 
 let systems = new_system(&settings);
 
-let object: Objects = Objects{systems : systems, settings : settings, egui : egui};
+let model: Model = Model{systems : systems, settings : settings, egui : egui};
 
-return object
+return model
 
 }
 
-fn calculations(objects: &mut Vec<Planet>) {
+fn calculations(planets: &mut Vec<Planet>) {
 	
 	let mut i = 0;
-	while i < objects.len()-1 {
+	while i < planets.len()-1 {
 		let mut j = i+1;
-		while j < objects.len() {
-			let impulse = objects[i].force(&objects[j]);
-			objects[i].vel += impulse;	
-			objects[j].vel += impulse.mul(-1.0);
+		while j < planets.len() {
+			let impulse = planets[i].force(&planets[j]);
+			planets[i].vel += impulse;	
+			planets[j].vel += impulse.mul(-1.0);
 			j += 1;
 		}
 
 		i += 1;
 	}
-	for e in objects.iter_mut() {
+	for e in planets.iter_mut() {
 		e.pos += e.vel;
 	}
 }
 
-fn update(_app: &App, world: &mut Objects, update: Update) {
+fn update(_app: &App, model: &mut Model, update: Update) {
  
 
-let systems = &mut world.systems;
-let egui = &mut world.egui;
-let settings = &mut world.settings;
+let systems = &mut model.systems;
+let egui = &mut model.egui;
+let settings = &mut model.settings;
 
 egui.set_elapsed_time(update.since_start);
 let ctx = egui.begin_frame();
@@ -194,45 +194,45 @@ egui::Window::new("Settings").show(&ctx, |ui| {
 		*systems = new_system(&settings);
 	}
 });
-for objects in systems.iter_mut() {
-	objects[0].mass = settings.mass1;
-	objects[0].colour = settings.color1;
-	objects[1].mass = settings.mass2;
-	objects[1].colour = settings.color2;
-	objects[2].mass = settings.mass3;
-	objects[2].colour = settings.color3;
-	calculations(objects);
+for planets in systems.iter_mut() {
+	planets[0].mass = settings.mass1;
+	planets[0].colour = settings.color1;
+	planets[1].mass = settings.mass2;
+	planets[1].colour = settings.color2;
+	planets[2].mass = settings.mass3;
+	planets[2].colour = settings.color3;
+	calculations(planets);
 
 	}
 }
 
-fn draw_system(draw: &Draw, objects: &Vec<Planet>) {
+fn draw_system(draw: &Draw, planets: &Vec<Planet>) {
 	
-	for i in objects.iter() {
+	for planet in planets.iter() {
 	draw.ellipse()
-		.xy(i.pos)
-		.radius(i.mass/10.0)
-		.color(i.colour);	
+		.xy(planet.pos)
+		.radius(planet.mass/10.0)
+		.color(planet.colour);	
 	}
 }
 
-fn view(app: &App, world: &Objects, frame: Frame) {
+fn view(app: &App, model: &Model, frame: Frame) {
     // Begin drawing
     let draw = app.draw();
 
     // Clear the background to blue.
    //	draw.background().color(rgba(0.0,0.0,0.0,0.001));
 	let screen = app.window_rect();
-	let settings = &world.settings;
+	let settings = &model.settings;
 	let trails = (settings.trails - 1.0) * -1.0;
 	draw.rect().w(screen.w()).h(screen.h()).color(rgba(0.0,0.0,0.0,trails));
 	
 
-	for objects in world.systems.iter(){
+	for planets in model.systems.iter(){
 
-		draw_system(&draw,&objects);
+		draw_system(&draw,&planets);
 	}
     // Write the result of our drawing to the window's frame.
 	draw.to_frame(app, &frame).unwrap();
-	world.egui.draw_to_frame(&frame).unwrap();
+	model.egui.draw_to_frame(&frame).unwrap();
 }
